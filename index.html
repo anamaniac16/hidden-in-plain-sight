@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hidden in Plain Sight</title>
+<meta name="description" content="A genetic algorithm evolves camouflage to find the blind spots of a neural network, then the network is hardened against them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="#brief" data-view="brief">Hidden <em>in</em> Plain Sight</a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#brief" data-view="brief">Brief</a>
+      <a href="#lab" data-view="lab">Lab</a>
+      <a href="#hunt" data-view="hunt">Hunt</a>
+      <a href="#findings" data-view="findings">Findings</a>
+      <a href="#method" data-view="method">Method</a>
+    </nav>
+    <div class="status-pill" id="globalStatus"><span class="dot"></span><span class="txt">Starting</span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================ BRIEF ============================ -->
+<section class="view" id="view-brief" data-view="brief">
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Soft computing project &middot; Genetic algorithm &times; neural network</p>
+      <h1>Can evolution <em>hide</em> from a neural network?</h1>
+      <p class="lede">A neural network is trained to spot creatures in a habitat. A genetic algorithm evolves the creatures' colours to slip past it. Whatever survives shows exactly where the AI is blind. Then the AI is retrained on those creatures, and the race starts again.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#lab" data-view="lab">Open the lab</a>
+        <a class="btn ghost" href="#hunt" data-view="hunt">Play: find them before the AI</a>
+      </div>
+    </div>
+    <figure class="plate hero-plate">
+      <div class="plate-head"><span>Plate I</span><span id="heroPlateName">Lichen birch bark</span></div>
+      <div class="canvas-box"><canvas id="heroCanvas" width="720" height="432"></canvas></div>
+      <figcaption id="heroCaption">The predator scans the bark. Amber boxes are creatures it caught.</figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap section">
+    <div class="section-head">
+      <p class="eyebrow">The real-world problem</p>
+      <h2>AI cameras can be fooled by patterns we would never notice</h2>
+      <p class="sub">Researchers have already shown this in the physical world. If AI vision is used to drive cars, guard buildings or read scans, these blind spots must be found before someone exploits them.</p>
+    </div>
+    <div class="cases">
+      <article class="case">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="22,6 42,6 58,22 58,42 42,58 22,58 6,42 6,22" class="ic-stroke"/><rect x="16" y="20" width="10" height="5" class="ic-fill"/><rect x="38" y="38" width="10" height="5" class="ic-fill"/><text x="32" y="36" text-anchor="middle" class="ic-text">STOP</text></svg>
+        <h3>Stickers on a stop sign</h3>
+        <p>A few black and white stickers made a vision model read a stop sign as a speed-limit sign in most test frames. A human driver still sees STOP.</p>
+        <p class="cite">Eykholt et al., CVPR 2018</p>
+      </article>
+      <article class="case">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 30 Q6 22 14 22 H26 Q30 22 30 30 Q30 40 20 40 Q8 40 6 30Z M58 30 Q58 22 50 22 H38 Q34 22 34 30 Q34 40 44 40 Q56 40 58 30Z" class="ic-stroke"/><path d="M30 28 Q32 25 34 28" class="ic-stroke"/><circle cx="16" cy="30" r="3" class="ic-fill"/><circle cx="46" cy="32" r="3" class="ic-fill"/></svg>
+        <h3>Patterned eyeglasses</h3>
+        <p>Printed frames let one person be recognised as a different, chosen person by a face-recognition system.</p>
+        <p class="cite">Sharif et al., ACM CCS 2016</p>
+      </article>
+      <article class="case">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 8 L32 14 L42 8 L58 18 L52 30 L46 27 V56 H18 V27 L12 30 L6 18 Z" class="ic-stroke"/><rect x="24" y="32" width="6" height="6" class="ic-fill"/><rect x="34" y="40" width="6" height="6" class="ic-fill"/><rect x="30" y="26" width="5" height="5" class="ic-fill"/></svg>
+        <h3>A printed T-shirt</h3>
+        <p>A specially patterned shirt let its wearer go undetected by a person-detection model in a large share of video frames.</p>
+        <p class="cite">Xu et al., ECCV 2020</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="wrap section loop-section">
+    <div class="section-head">
+      <p class="eyebrow">What this project does about it</p>
+      <h2>An automatic red team for vision AI</h2>
+      <p class="sub">Instead of a human searching for weak spots by hand, evolution searches for them. Each blind spot it finds is used to make the AI stronger.</p>
+    </div>
+    <div class="loop">
+      <svg viewBox="0 0 420 300" class="loop-svg" role="img" aria-label="Three-step loop: the network learns, evolution attacks, the network hardens">
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arrowhead"/></marker></defs>
+        <path d="M150 70 Q210 20 270 70" class="loop-arc" marker-end="url(#arr)"/>
+        <path d="M320 140 Q330 220 250 250" class="loop-arc" marker-end="url(#arr)"/>
+        <path d="M170 250 Q90 220 100 140" class="loop-arc" marker-end="url(#arr)"/>
+        <g class="node"><circle cx="110" cy="100" r="46"/><text x="110" y="96">ANN</text><text x="110" y="114" class="small">learns</text></g>
+        <g class="node amber"><circle cx="310" cy="100" r="46"/><text x="310" y="96">GA</text><text x="310" y="114" class="small">attacks</text></g>
+        <g class="node sage"><circle cx="210" cy="240" r="46"/><text x="210" y="236">ANN</text><text x="210" y="254" class="small">hardens</text></g>
+      </svg>
+      <ol class="loop-steps">
+        <li><b>The predator learns.</b> A neural network is trained on thousands of habitat patches, some with a creature and some without, until it spots creatures almost every time.</li>
+        <li><b>The prey evolve.</b> Each creature's colour pattern is a chromosome. Creatures the network spots die; the ones it misses breed. Within a few generations the network starts missing most of them.</li>
+        <li><b>The predator hardens.</b> The surviving creatures are added to its training data. The project then measures how much longer evolution needs to fool it again.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="wrap section moth">
+    <div class="moth-copy">
+      <p class="eyebrow">Nature ran this experiment first</p>
+      <h2>The peppered moth</h2>
+      <p>In 19th-century England, soot from factories blackened tree bark. Pale peppered moths became easy prey for birds, and dark moths became common within decades. It is the classic textbook example of natural selection. In the lab you can switch from lichen bark to soot bark and watch the same thing happen against a neural-network bird.</p>
+      <a class="btn ghost small" href="#lab" data-view="lab" data-habitat="soot">Try the soot habitat</a>
+    </div>
+    <div class="moth-swatches" id="mothSwatches"></div>
+  </div>
+</section>
+
+<!-- ============================ LAB ============================ -->
+<section class="view" id="view-lab" data-view="lab" hidden>
+  <div class="wrap lab">
+    <div class="lab-main">
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Habitat" id="habitatSeg"></div>
+        <div class="seg" role="group" aria-label="Species" id="speciesSeg"></div>
+      </div>
+      <figure class="plate">
+        <div class="plate-head"><span id="labPlateNo">Plate II</span><span id="labPlateName">Lichen birch bark</span></div>
+        <div class="canvas-box" id="labBox">
+          <canvas id="labCanvas" width="720" height="432"></canvas>
+          <canvas id="labOverlay" width="720" height="432" class="overlay"></canvas>
+          <div class="canvas-veil" id="labVeil" hidden><div class="veil-card"><p class="veil-title" id="veilTitle">Training the predator</p><div class="meter"><span id="veilBar"></span></div><p class="veil-sub" id="veilSub">Showing it habitat patches with and without creatures</p></div></div>
+        </div>
+        <div class="plate-foot">
+          <label class="switch"><input type="checkbox" id="toggleVision"><span></span>Predator vision</label>
+          <label class="switch"><input type="checkbox" id="toggleReveal"><span></span>Mark the creatures</label>
+          <span class="foot-note" id="sceneNote">12 of 36 creatures shown</span>
+        </div>
+      </figure>
+
+      <div class="panel drawer">
+        <div class="panel-head">
+          <h3>Specimen drawer</h3>
+          <p class="panel-sub">The whole population of 36, most hidden first, each on its own patch of habitat. Select one to inspect its genes. Look closely: creatures that fool the AI often look obvious to you. Those are adversarial examples, the AI's blind spots rather than ours.</p>
+        </div>
+        <div class="specimens" id="specimens"></div>
+      </div>
+    </div>
+
+    <aside class="lab-side">
+      <div class="panel readout">
+        <div class="readout-top">
+          <span class="phase" id="phase" data-phase="idle">Idle</span>
+          <span class="mono" id="roundGen">Round 1 &middot; Gen 0</span>
+        </div>
+        <p class="big-label">AI detection rate</p>
+        <p class="big-number" id="detRate">&ndash;</p>
+        <div class="det-bar"><span id="detBar"></span><i class="thresh" title="Fooled threshold: 10%"></i></div>
+        <dl class="mini-stats">
+          <div><dt>Avg. suspicion</dt><dd id="meanP">&ndash;</dd></div>
+          <div><dt>Most hidden</dt><dd id="bestP">&ndash;</dd></div>
+          <div><dt>Baseline catch</dt><dd id="baseline">&ndash;</dd></div>
+        </dl>
+      </div>
+
+      <div class="panel controls">
+        <button class="btn primary wide" id="btnEvolve">Evolve prey</button>
+        <div class="btn-row">
+          <button class="btn ghost" id="btnStep">Step once</button>
+          <button class="btn ghost" id="btnHarden">Harden the AI</button>
+        </div>
+        <button class="btn amber wide" id="btnAuto">Run 4-round arms race</button>
+        <label class="range"><span>Speed</span><input type="range" id="speed" min="1" max="12" value="5"><output id="speedOut">5 gen/s</output></label>
+        <button class="btn text" id="btnReset">Start a fresh experiment</button>
+      </div>
+
+      <div class="panel chart-panel">
+        <div class="panel-head row">
+          <h3>Arms race</h3>
+          <span class="legend"><i class="lg-line"></i>detected <i class="lg-amber"></i>AI hardened</span>
+        </div>
+        <canvas id="raceChart" width="300" height="210"></canvas>
+        <p class="panel-sub" id="raceNote">Each drop is evolution finding a blind spot. Each jump is the AI learning from it.</p>
+      </div>
+
+      <div class="panel mind">
+        <div class="panel-head row">
+          <h3>Inside the predator</h3>
+          <span class="mono dim" id="paramCount"></span>
+        </div>
+        <p class="panel-sub">What 24 of its first-layer neurons respond to. Training loss below.</p>
+        <canvas id="mindCanvas" width="384" height="256"></canvas>
+        <canvas id="lossChart" width="300" height="96"></canvas>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================ HUNT ============================ -->
+<section class="view" id="view-hunt" data-view="hunt" hidden>
+  <div class="wrap hunt">
+    <div class="hunt-head">
+      <div>
+        <p class="eyebrow">Human vs AI</p>
+        <h2>Find them before the AI does</h2>
+        <p class="sub">Eight creatures evolved in the lab are hiding on this habitat. You get 30 seconds. Then the neural network scans the same image. Do people and the AI miss the same creatures?</p>
+      </div>
+      <div class="hunt-score">
+        <div><span class="mono dim">You</span><b id="huntYou">0</b><span class="mono dim">/ 8</span></div>
+        <div><span class="mono dim">AI</span><b id="huntAI">&ndash;</b><span class="mono dim">/ 8</span></div>
+        <div class="timer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" class="t-bg"/><circle cx="22" cy="22" r="19" class="t-fg" id="timerRing"/></svg><span id="huntTime">30</span></div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Which prey to hunt" id="huntSeg">
+        <button type="button" data-src="fooled" class="on">Prey that fooled the AI</button>
+        <button type="button" data-src="current">Current prey</button>
+      </div>
+    </div>
+    <figure class="plate">
+      <div class="plate-head"><span>Plate III</span><span id="huntPlateName">Lichen birch bark</span></div>
+      <div class="canvas-box hunt-box" id="huntBox">
+        <canvas id="huntCanvas" width="720" height="432"></canvas>
+        <canvas id="huntOverlay" width="720" height="432" class="overlay"></canvas>
+        <div class="canvas-veil" id="huntVeil"><div class="veil-card">
+          <p class="veil-title" id="huntVeilTitle">Ready when you are</p>
+          <p class="veil-sub" id="huntVeilSub">Click or tap each creature you find. Wrong clicks don't cost anything.</p>
+          <button class="btn primary" id="btnHunt">Start the hunt</button>
+        </div></div>
+      </div>
+    </figure>
+    <div class="hunt-result" id="huntResult" hidden></div>
+  </div>
+</section>
+
+<!-- ============================ FINDINGS ============================ -->
+<section class="view" id="view-findings" data-view="findings" hidden>
+  <div class="wrap findings">
+    <div class="section-head">
+      <p class="eyebrow">Lab report &middot; written from this session's measurements</p>
+      <h2>What the experiment shows</h2>
+      <p class="sub" id="findingsIntro">Every number below is measured live in your browser from the lab, the hunt and the robustness test. Run more and the report updates.</p>
+    </div>
+    <div class="claims" id="claims"></div>
+    <div class="findings-grid">
+      <div class="panel">
+        <div class="panel-head"><h3>Generations needed to fool the AI</h3><p class="panel-sub">Fewer generations means an easier target. Measured in the lab, round by round.</p></div>
+        <canvas id="gensChart" width="300" height="240"></canvas>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>Robustness test</h3><p class="panel-sub">A brand-new population of random creatures attacks the original AI and the hardened AI. Three attacks each, up to 60 generations.</p></div>
+        <div id="robust"></div>
+        <button class="btn amber" id="btnRobust">Run robustness test</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Round log</h3></div>
+      <div class="table-wrap"><table class="log" id="roundLog"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ METHOD ============================ -->
+<section class="view" id="view-method" data-view="method" hidden>
+  <div class="wrap method">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2>Method</h2>
+      <p class="sub">Everything runs in plain JavaScript in the browser. There is no machine-learning library: the neural network, backpropagation and the genetic algorithm are written from scratch in <span class="mono">js/engine.js</span>.</p>
+    </div>
+
+    <div class="method-grid">
+      <div class="panel">
+        <div class="panel-head"><h3>Genetic algorithm &middot; the prey</h3></div>
+        <dl class="spec">
+          <div><dt>Chromosome</dt><dd>An 8 &times; 8 grid of colours, 192 real-valued genes (R, G, B per cell). Smoothly stretched over the body shape.</dd></div>
+          <div><dt>Population</dt><dd>36 creatures</dd></div>
+          <div><dt>Fitness</dt><dd>1 &minus; P(detected), averaged over 5 random spots in the habitat. At each spot the network gets 3 looks from slightly shifted windows and keeps its highest score. All creatures in a generation face the same spots.</dd></div>
+          <div><dt>Selection</dt><dd>Tournament selection, size 3</dd></div>
+          <div><dt>Crossover</dt><dd>2D crossover (probability 0.85): a random rectangle of the pattern grid is copied from the second parent</dd></div>
+          <div><dt>Mutation</dt><dd>Gaussian, rate 0.08 per gene, &sigma; = 0.09. With probability 0.15 a whole colour channel drifts together.</dd></div>
+          <div><dt>Elitism</dt><dd>The 2 best creatures survive unchanged</dd></div>
+        </dl>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>Neural network &middot; the predator</h3></div>
+        <dl class="spec">
+          <div><dt>Input</dt><dd>A 32 &times; 32 window of the scene, averaged to 16 &times; 16, as three opponent colour channels (brightness, red&ndash;green, blue&ndash;yellow) like animal vision. 768 inputs.</dd></div>
+          <div><dt>Architecture</dt><dd>Multilayer perceptron 768 &rarr; 64 &rarr; 24 &rarr; 1. ReLU hidden layers, sigmoid output.</dd></div>
+          <div><dt>Output</dt><dd>P(a creature is in this window)</dd></div>
+          <div><dt>Training</dt><dd>Backpropagation, binary cross-entropy loss, Adam optimiser (learning rate 0.0015), mini-batches of 32, half positive, half empty habitat</dd></div>
+          <div><dt>Scanning</dt><dd>The window slides across the scene every 8 pixels to build the predator-vision heatmap</dd></div>
+          <div><dt>Hardening</dt><dd>Adversarial training: 450 more steps with evolved creatures (50%), earlier survivors (35%) and random creatures (15%) as positives</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>The loop</h3></div>
+      <pre class="code"><code>train predator on random creatures            <span class="c">// naive AI</span>
+population = 36 random creatures
+repeat for each round:
+    repeat:
+        for each creature: fitness = 1 - P(predator spots it)
+        keep 2 best; fill the rest by
+            tournament selection -> 2D crossover -> mutation
+    until detection rate &le; 10%                   <span class="c">// blind spot found</span>
+    retrain predator on the survivors           <span class="c">// adversarial training</span>
+measure: generations to fool, before vs after hardening</code></pre>
+    </div>
+
+    <div class="method-grid">
+      <div class="panel">
+        <div class="panel-head"><h3>Syllabus concepts used</h3></div>
+        <ul class="tags">
+          <li>Chromosome encoding</li><li>Fitness function</li><li>Tournament selection</li><li>Crossover</li><li>Mutation</li><li>Elitism</li><li>Perceptron</li><li>Multilayer network</li><li>Activation functions</li><li>Backpropagation</li><li>Gradient descent (Adam)</li><li>Loss function</li>
+        </ul>
+        <div class="panel-head"><h3>Newer ideas it demonstrates</h3></div>
+        <ul class="tags amber">
+          <li>Adversarial examples</li><li>Adversarial training</li><li>Co-evolution</li><li>Black-box attack</li><li>AI red-teaming</li><li>Robustness evaluation</li>
+        </ul>
+        <p class="panel-sub">The GA never looks inside the network. It only sees the network's output, the same position as an outside attacker. That makes this a black-box attack.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>References</h3></div>
+        <ol class="refs">
+          <li>Goodfellow, Shlens &amp; Szegedy. <i>Explaining and Harnessing Adversarial Examples.</i> ICLR 2015.</li>
+          <li>Madry et al. <i>Towards Deep Learning Models Resistant to Adversarial Attacks.</i> ICLR 2018.</li>
+          <li>Eykholt et al. <i>Robust Physical-World Attacks on Deep Learning Visual Classification.</i> CVPR 2018.</li>
+          <li>Sharif et al. <i>Accessorize to a Crime.</i> ACM CCS 2016.</li>
+          <li>Xu et al. <i>Adversarial T-Shirt! Evading Person Detectors in a Physical World.</i> ECCV 2020.</li>
+          <li>Kettlewell. <i>Selection experiments on industrial melanism in the Lepidoptera.</i> Heredity, 1955.</li>
+          <li>Holland. <i>Adaptation in Natural and Artificial Systems.</i> 1975.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Inspector -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <button class="sheet-close" id="sheetClose" aria-label="Close">&times;</button>
+    <div class="sheet-grid">
+      <canvas id="sheetBig" width="192" height="192"></canvas>
+      <div>
+        <p class="eyebrow" id="sheetLatin">Biston evolvens</p>
+        <h3 id="sheetTitle">Specimen No. 0001</h3>
+        <dl class="mini-stats col" id="sheetStats"></dl>
+        <p class="panel-sub">Chromosome: 64 colour genes</p>
+        <canvas id="sheetGenes" width="160" height="160"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/engine.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
